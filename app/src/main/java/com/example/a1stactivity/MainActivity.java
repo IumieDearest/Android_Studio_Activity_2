@@ -22,8 +22,7 @@ import java.nio.charset.StandardCharsets;
 // The LOGIN screen.
 public class MainActivity extends AppCompatActivity {
 
-    // The address of the /login route on your Render server.
-    // CHANGE THIS to your own Render link, and keep "/login" at the end.
+    // The address of the /login route on your Render server
     private static final String LOGIN_URL = "https://android-studio-activity-2.onrender.com/login";
 
     @Override
@@ -62,12 +61,13 @@ public class MainActivity extends AppCompatActivity {
             btnLogin.setEnabled(false);
             btnLogin.setText(R.string.signing_in);
 
-            // 4. Android does not allow internet requests on the main (screen) thread,
-            //    because the app would freeze while waiting. So we use a new Thread,
-            //    just like running a background task in Swing.
+            // 4. Internet requests must run on a background thread,
+            //    otherwise the screen would freeze while waiting.
             new Thread(() -> {
                 boolean success = false;
                 String message;
+                String serverUsername = "";
+                String otp = "";
 
                 try {
                     // 4a. Open a connection to the server
@@ -89,10 +89,8 @@ public class MainActivity extends AppCompatActivity {
                     outputStream.write(requestBody.toString().getBytes(StandardCharsets.UTF_8));
                     outputStream.close();
 
-                    // 4d. Get the status code (200 = OK, 400/401 = error from our server)
+                    // 4d. Successful replies come from getInputStream(), error replies from getErrorStream()
                     int statusCode = connection.getResponseCode();
-
-                    // Successful replies come from getInputStream(), error replies from getErrorStream()
                     InputStream inputStream;
                     if (statusCode >= 200 && statusCode < 300) {
                         inputStream = connection.getInputStream();
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
                         inputStream = connection.getErrorStream();
                     }
 
-                    // 4e. Read the server's reply line by line into one String
+                    // 4e. Read the server's reply into one String
                     BufferedReader reader = new BufferedReader(
                             new InputStreamReader(inputStream, StandardCharsets.UTF_8));
                     StringBuilder responseText = new StringBuilder();
@@ -111,11 +109,13 @@ public class MainActivity extends AppCompatActivity {
                     reader.close();
                     connection.disconnect();
 
-                    // 4f. Turn the reply into JSON and read "success" and "message"
-                    //     Example reply: { "success": true, "message": "Login successful!..." }
+                    // 4f. Read the values from the JSON reply.
+                    //     optString() returns "" if the value isn't there (for example, on a failed login)
                     JSONObject response = new JSONObject(responseText.toString());
                     success = response.getBoolean("success");
                     message = response.getString("message");
+                    serverUsername = response.optString("username", "");
+                    otp = response.optString("otp", "");
 
                 } catch (Exception e) {
                     // No internet, wrong link, server down, etc.
@@ -125,18 +125,27 @@ public class MainActivity extends AppCompatActivity {
                 // 5. Values used inside runOnUiThread must not change, so we copy them
                 boolean finalSuccess = success;
                 String finalMessage = message;
+                String finalUsername = serverUsername;
+                String finalOtp = otp;
 
                 // 6. Only the main thread may change the screen, so we switch back to it
                 runOnUiThread(() -> {
-                    // Turn the button back on
                     btnLogin.setEnabled(true);
                     btnLogin.setText(R.string.btn_sign_in);
 
-                    // Show the server's message (success or error)
-                    Toast.makeText(MainActivity.this, finalMessage, Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this, finalMessage, Toast.LENGTH_SHORT).show();
 
                     if (finalSuccess) {
-                        // NEXT STEP: open the OTP screen here
+                        // Clear the password so it isn't still there when the user comes back
+                        etPassword.setText("");
+
+                        // 7. Open the OTP screen and pass along the username and the code.
+                        //    putExtra() attaches data to the Intent, like passing
+                        //    arguments to a constructor when opening a new JFrame.
+                        Intent intent = new Intent(MainActivity.this, OtpActivity.class);
+                        intent.putExtra("username", finalUsername);
+                        intent.putExtra("otp", finalOtp);
+                        startActivity(intent);
                     }
                 });
             }).start();
