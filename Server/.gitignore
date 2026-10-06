@@ -1,0 +1,2 @@
+# Installed packages are downloaded again by "npm install", so don't upload them
+node_modules/
