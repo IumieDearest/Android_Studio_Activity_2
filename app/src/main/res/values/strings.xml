@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">1st Activity</string>
+
+    <string name="title_welcome_back">Welcome Back</string>
+    <string name="subtitle_login">Sign in with your username and password to access your account.</string>
+    <string name="label_username">Username</string>
+    <string name="hint_username">Enter your username</string>
+    <string name="remember_me">Remember me</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="btn_sign_in">Sign In</string>
+    <string name="no_account">Don\'t have an account?</string>
+
+    <string name="title_create_account">Create your account</string>
+    <string name="subtitle_sign_up">Fill in your email and password to create your account and get started.</string>
+    <string name="label_email">Email Address</string>
+    <string name="hint_email">Enter your email</string>
+    <string name="label_confirm_email">Confirm Email Address</string>
+    <string name="hint_confirm_email">Re-enter your email</string>
+    <string name="label_confirm_password">Confirm Password</string>
+    <string name="hint_confirm_password">Re-enter your password</string>
+    <string name="agree_terms">I agree to the Terms &amp; Privacy Policy</string>
+    <string name="have_account">Already have an account?</string>
+    <string name="desc_back">Go back</string>
+
+    <string name="label_password">Password</string>
+    <string name="hint_password">Enter your password</string>
+    <string name="btn_sign_up">Sign Up</string>
+    <string name="btn_google">Google</string>
+    <string name="btn_apple">Apple</string>
+    <string name="text_or">or</string>
+</resources>
