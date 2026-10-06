@@ -25,7 +25,7 @@
     <string name="label_password">Password</string>
     <string name="hint_password">Enter your password</string>
     <string name="btn_sign_up">Sign Up</string>
-    <string name="btn_google">Google</string>
-    <string name="btn_apple">Apple</string>
-    <string name="text_or">or</string>
+    <string name="signing_in">Signing in…</string>
+    <string name="error_empty_fields">Please enter your username and password.</string>
+    <string name="error_connection">Could not connect to the server. Check your internet and try again.</string>
 </resources>
