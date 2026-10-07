@@ -7,6 +7,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -95,17 +96,18 @@ public class OtpActivity extends AppCompatActivity {
                 boolean finalSuccess = success;
                 String finalMessage = message;
 
-                // Back to the main thread to update the screen
                 runOnUiThread(() -> {
                     btnVerify.setEnabled(true);
                     btnVerify.setText(R.string.btn_verify);
                     Toast.makeText(OtpActivity.this, finalMessage, Toast.LENGTH_LONG).show();
 
                     if (finalSuccess) {
-                        // Stop the countdown and show that the account is verified
                         countDownTimer.cancel();
-                        tvTimer.setText(R.string.verified);
-                        // NEXT STEP (optional): open a home/welcome screen here
+
+                        Intent intent = new Intent(OtpActivity.this, UsersActivity.class);
+                        startActivity(intent);
+
+                        finish();
                     }
                 });
             }).start();

@@ -54,4 +54,12 @@
     <string name="creating_account">Creating account…</string>
     <string name="error_fill_all">Please fill in all fields.</string>
     <string name="error_terms">Please agree to the Terms &amp; Privacy Policy.</string>
+
+    <string name="title_users">List of Users</string>
+    <string name="loading_users">Loading users…</string>
+    <string name="user_count">Registered users: %1$d</string>
+    <string name="header_number">#</string>
+    <string name="header_name">Name</string>
+    <string name="header_email">Email</string>
+    <string name="btn_log_out">Log Out</string>
 </resources>
