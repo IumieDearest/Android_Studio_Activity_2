@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SIGN UP SCREEN (res/layout/activity_sign_up.xml)
-     Same structure as the login screen: ScrollView > vertical LinearLayout. -->
+     NEW: First Name and Last Name fields above the Email field. -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
@@ -16,8 +16,7 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- ===== BACK ARROW (works like the old Cancel button) =====
-             selectableItemBackgroundBorderless = round ripple effect when tapped -->
+        <!-- ===== BACK ARROW ===== -->
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="40dp"
@@ -46,6 +45,55 @@
             android:textColor="@color/text_secondary"
             android:textSize="14sp" />
 
+
+        <!-- ===== NEW: FIRST NAME ===== -->
+        <!-- textCapWords makes the keyboard start each word with a capital letter -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/label_first_name"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/etFirstName"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="6dp"
+            android:autofillHints="personGivenName"
+            android:background="@drawable/bg_input"
+            android:hint="@string/hint_first_name"
+            android:inputType="textPersonName|textCapWords"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <!-- ===== NEW: LAST NAME ===== -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/label_last_name"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/etLastName"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="6dp"
+            android:autofillHints="personFamilyName"
+            android:background="@drawable/bg_input"
+            android:hint="@string/hint_last_name"
+            android:inputType="textPersonName|textCapWords"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary"
+            android:textSize="14sp" />
 
         <!-- ===== EMAIL ===== -->
         <TextView

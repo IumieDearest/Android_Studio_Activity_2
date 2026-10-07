@@ -45,4 +45,13 @@
     <string name="demo_code">Your code: %1$s</string>
     <string name="timer_expires">Code expires in %1$d seconds</string>
     <string name="timer_expired">Code expired. Tap Resend for a new one.</string>
+
+    <string name="label_first_name">First Name</string>
+    <string name="hint_first_name">Enter your first name</string>
+    <string name="label_last_name">Last Name</string>
+    <string name="hint_last_name">Enter your last name</string>
+
+    <string name="creating_account">Creating account…</string>
+    <string name="error_fill_all">Please fill in all fields.</string>
+    <string name="error_terms">Please agree to the Terms &amp; Privacy Policy.</string>
 </resources>
