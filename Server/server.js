@@ -156,6 +156,20 @@ app.post("/verify-otp", (req, res) => {
   return res.status(200).json({ success: true, message: "Verified! Welcome, " + name + "." });
 });
 
+app.get("/users", (req, res) => {
+  const userList = users.map(u => ({
+    firstName: u.firstName,
+    lastName: u.lastName,
+    email: u.email
+  }));
+
+  return res.status(200).json({
+    success: true,
+    count: userList.length,
+    users: userList
+  });
+});
+
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
 });
