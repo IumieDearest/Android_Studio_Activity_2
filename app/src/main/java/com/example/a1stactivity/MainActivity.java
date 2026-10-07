@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
         Button btnLogin = findViewById(R.id.btnLogin);
         TextView tvGoToSignUp = findViewById(R.id.tvGoToSignUp);
 
-        // "Sign Up" text at the bottom: opens the Sign Up screen
         tvGoToSignUp.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, SignUpActivity.class);
             startActivity(intent);
