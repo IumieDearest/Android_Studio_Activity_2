@@ -7,14 +7,20 @@ import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.startsWith;
 
 import android.os.SystemClock;
 import android.view.View;
+import android.widget.TextView;
+
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
 
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -34,7 +40,8 @@ import org.junit.runners.MethodSorters;
 //  fields, taps Sign In, and checks the result from the Render server.
 //
 //    Scenario 1: Invalid Login -> wrong password, must stay on the Login screen
-//    Scenario 2: Valid Login   -> correct account, must open the OTP screen
+//    Scenario 2: Valid Login   -> correct account, opens the OTP screen,
+//                                 types the code, and opens the Users list
 // =====================================================================
 
 // Tells Android to run this class as an instrumented test (on the emulator)
@@ -118,9 +125,64 @@ public class LoginAutomationTest {
 
         // 4. CHECK: the code from the server is shown on the OTP screen
         onView(withId(R.id.tvDemoCode)).check(matches(isDisplayed()));
+        pause(STEP_DELAY_MS);
 
-        // Keep the OTP screen up so the viewer can see it opened
+        // ===== OTP PART =====
+        // 5. Read the code from the grey box. The box says "Your code: 4821",
+        //    so replaceAll("[^0-9]", "") removes everything that isn't a digit -> "4821"
+        String boxText = getTextFromView(R.id.tvDemoCode);
+        String otpCode = boxText.replaceAll("[^0-9]", "");
+
+        // 6. Type the code one digit at a time, like a person would.
+        //    (The code expires in 30 seconds, but this whole part takes only a few.)
+        typeSlowly(R.id.etOtp, otpCode);
+        pause(STEP_DELAY_MS);
+
+        // 7. Tap Verify
+        onView(withId(R.id.btnVerify)).perform(scrollTo(), click());
+
+        // 8. CHECK: wait until the Users screen opens AND the list has loaded.
+        //    The count text says "Loading users…" first, then "Registered users: 2".
+        waitUntil(withId(R.id.tvUserCount),
+                withText(startsWith("Registered users")),
+                SERVER_TIMEOUT_MS);
+
+        // Keep the Users list up so the viewer can see the final result
         pause(RESULT_DELAY_MS);
+    }
+
+    // -----------------------------------------------------------------
+    //  NEW HELPER: reads the text that is currently shown in a TextView.
+    //
+    //  Espresso normally only CHECKS views, so we make our own small
+    //  ViewAction that copies the text out into a String we can use.
+    // -----------------------------------------------------------------
+    private String getTextFromView(int viewId) {
+        // An array is used because values changed inside the inner class must be final
+        final String[] textHolder = {""};
+
+        onView(withId(viewId)).perform(new ViewAction() {
+
+            // This action only works on TextViews (and things like EditText that extend it)
+            @Override
+            public Matcher<View> getConstraints() {
+                return isAssignableFrom(TextView.class);
+            }
+
+            // A short description, shown in the error message if something goes wrong
+            @Override
+            public String getDescription() {
+                return "read the text of a TextView";
+            }
+
+            // The actual work: copy the text into textHolder
+            @Override
+            public void perform(UiController uiController, View view) {
+                textHolder[0] = ((TextView) view).getText().toString();
+            }
+        });
+
+        return textHolder[0];
     }
 
     // -----------------------------------------------------------------
