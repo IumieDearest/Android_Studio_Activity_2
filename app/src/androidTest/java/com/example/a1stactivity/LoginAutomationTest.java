@@ -47,6 +47,12 @@ public class LoginAutomationTest {
     // free Render server can take about a minute to wake up.
     private static final long SERVER_TIMEOUT_MS = 90000;
 
+    // NEW: delays so a person watching can follow every step (in milliseconds).
+    // Make these bigger to slow the test down, or smaller to speed it up.
+    private static final long TYPING_DELAY_MS = 150;  // pause between each typed letter
+    private static final long STEP_DELAY_MS = 1500;   // pause between steps
+    private static final long RESULT_DELAY_MS = 3000; // pause to look at the result
+
     // Before EACH test, open a fresh Login screen (MainActivity)
     @Rule
     public ActivityScenarioRule<MainActivity> activityRule =
@@ -59,10 +65,14 @@ public class LoginAutomationTest {
     // -----------------------------------------------------------------
     @Test
     public void scenario1_invalidLogin() {
-        // 1. Type the username and a wrong password.
-        //    replaceText() clears the box first (in case an email was pre-filled).
-        onView(withId(R.id.etUsername)).perform(replaceText("student"), closeSoftKeyboard());
-        onView(withId(R.id.etPassword)).perform(replaceText("wrongpassword"), closeSoftKeyboard());
+        // Give the viewer a moment to see the Login screen first
+        pause(STEP_DELAY_MS);
+
+        // 1. Type the username and a wrong password, one letter at a time
+        typeSlowly(R.id.etUsername, "student");
+        pause(STEP_DELAY_MS);
+        typeSlowly(R.id.etPassword, "wrongpassword");
+        pause(STEP_DELAY_MS);
 
         // 2. Tap Sign In (scrollTo() makes sure the button is on screen first)
         onView(withId(R.id.btnLogin)).perform(scrollTo(), click());
@@ -79,6 +89,9 @@ public class LoginAutomationTest {
 
         // 5. CHECK: ...and the OTP screen did NOT open
         onView(withId(R.id.etOtp)).check(doesNotExist());
+
+        // Keep the screen up so the viewer can read the error message
+        pause(RESULT_DELAY_MS);
     }
 
     // -----------------------------------------------------------------
@@ -88,9 +101,13 @@ public class LoginAutomationTest {
     // -----------------------------------------------------------------
     @Test
     public void scenario2_validLogin() {
+        pause(STEP_DELAY_MS);
+
         // 1. Type a registered account (the test account on the Render server)
-        onView(withId(R.id.etUsername)).perform(replaceText("student"), closeSoftKeyboard());
-        onView(withId(R.id.etPassword)).perform(replaceText("password123"), closeSoftKeyboard());
+        typeSlowly(R.id.etUsername, "student");
+        pause(STEP_DELAY_MS);
+        typeSlowly(R.id.etPassword, "password123");
+        pause(STEP_DELAY_MS);
 
         // 2. Tap Sign In
         onView(withId(R.id.btnLogin)).perform(scrollTo(), click());
@@ -101,6 +118,38 @@ public class LoginAutomationTest {
 
         // 4. CHECK: the code from the server is shown on the OTP screen
         onView(withId(R.id.tvDemoCode)).check(matches(isDisplayed()));
+
+        // Keep the OTP screen up so the viewer can see it opened
+        pause(RESULT_DELAY_MS);
+    }
+
+    // -----------------------------------------------------------------
+    //  NEW HELPER: types text into a field one letter at a time,
+    //  so it looks like a person typing instead of pasting.
+    //
+    //  How it works: for "student" it shows "s", then "st", then "stu"...
+    //  waiting a little between each one. replaceText() is used for each
+    //  step because it works the same on every keyboard and for password fields.
+    // -----------------------------------------------------------------
+    private void typeSlowly(int fieldId, String text) {
+        // Start with an empty box (in case an email was pre-filled)
+        onView(withId(fieldId)).perform(replaceText(""));
+
+        for (int i = 1; i <= text.length(); i++) {
+            // substring(0, i) = the first i letters of the text
+            onView(withId(fieldId)).perform(replaceText(text.substring(0, i)));
+            pause(TYPING_DELAY_MS);
+        }
+
+        // Hide the keyboard so it doesn't cover the Sign In button
+        onView(withId(fieldId)).perform(closeSoftKeyboard());
+    }
+
+    // -----------------------------------------------------------------
+    //  NEW HELPER: waits for the given time, just so the viewer can follow along.
+    // -----------------------------------------------------------------
+    private void pause(long milliseconds) {
+        SystemClock.sleep(milliseconds);
     }
 
     // -----------------------------------------------------------------
@@ -115,12 +164,15 @@ public class LoginAutomationTest {
 
         while (true) {
             try {
+                // Try the check. If it passes, we're done waiting.
                 onView(viewMatcher).check(matches(condition));
                 return;
             } catch (Throwable error) {
+                // Not ready yet. If time is up, fail the test with the last error.
                 if (System.currentTimeMillis() > endTime) {
                     throw error;
                 }
+                // Otherwise wait half a second and try again
                 SystemClock.sleep(500);
             }
         }
