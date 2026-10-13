@@ -40,8 +40,9 @@ import org.junit.runners.MethodSorters;
 //  fields, taps Sign In, and checks the result from the Render server.
 //
 //    Scenario 1: Invalid Login -> wrong password, must stay on the Login screen
-//    Scenario 2: Valid Login   -> correct account, opens the OTP screen,
-//                                 types the code, and opens the Users list
+//    Scenario 2: Valid Login   -> correct account, opens the OTP screen, then:
+//                 2a. Invalid OTP -> wrong code, must stay on the OTP screen
+//                 2b. Valid OTP   -> correct code, must open the Users list
 // =====================================================================
 
 // Tells Android to run this class as an instrumented test (on the emulator)
@@ -127,21 +128,45 @@ public class LoginAutomationTest {
         onView(withId(R.id.tvDemoCode)).check(matches(isDisplayed()));
         pause(STEP_DELAY_MS);
 
-        // ===== OTP PART =====
-        // 5. Read the code from the grey box. The box says "Your code: 4821",
+        // ===== OTP PART A: INVALID OTP =====
+        // 5. Type a WRONG code. The server only makes codes from 1000 to 9999,
+        //    so "0000" can never be the right one.
+        typeSlowly(R.id.etOtp, "0000");
+        pause(STEP_DELAY_MS);
+
+        // 6. Tap Verify
+        onView(withId(R.id.btnVerify)).perform(scrollTo(), click());
+
+        // 7. Wait for the server's reply. While waiting, the button says "Verifying…".
+        //    When it's enabled and says "Verify" again, the server has answered.
+        waitUntil(withId(R.id.btnVerify),
+                allOf(isEnabled(), withText(R.string.btn_verify)),
+                SERVER_TIMEOUT_MS);
+
+        // 8. CHECK: we are still on the OTP screen, and the Users screen did NOT open
+        onView(withId(R.id.etOtp)).check(matches(isDisplayed()));
+        onView(withId(R.id.tvUserCount)).check(doesNotExist());
+
+        // Keep the screen up so the viewer can read "Incorrect code. Please try again."
+        pause(RESULT_DELAY_MS);
+
+        // ===== OTP PART B: VALID OTP =====
+        // A wrong code does NOT delete the real one on the server, so it still works.
+        // 9. Read the code from the grey box. The box says "Your code: 4821",
         //    so replaceAll("[^0-9]", "") removes everything that isn't a digit -> "4821"
         String boxText = getTextFromView(R.id.tvDemoCode);
         String otpCode = boxText.replaceAll("[^0-9]", "");
 
-        // 6. Type the code one digit at a time, like a person would.
-        //    (The code expires in 30 seconds, but this whole part takes only a few.)
+        // 10. Type the correct code one digit at a time, like a person would.
+        //     (The code expires in 30 seconds. Both OTP parts together take
+        //     about 10-15 seconds, so there is still enough time.)
         typeSlowly(R.id.etOtp, otpCode);
         pause(STEP_DELAY_MS);
 
-        // 7. Tap Verify
+        // 11. Tap Verify
         onView(withId(R.id.btnVerify)).perform(scrollTo(), click());
 
-        // 8. CHECK: wait until the Users screen opens AND the list has loaded.
+        // 12. CHECK: wait until the Users screen opens AND the list has loaded.
         //    The count text says "Loading users…" first, then "Registered users: 2".
         waitUntil(withId(R.id.tvUserCount),
                 withText(startsWith("Registered users")),
