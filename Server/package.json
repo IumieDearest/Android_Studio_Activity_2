@@ -1,7 +1,7 @@
 {
   "name": "activity-server",
   "version": "1.0.0",
-  "description": "Login, sign up and OTP server for the Android Studio activity",
+  "description": "Login, sign up, OTP and Supabase customer insert server for the Android Studio activity",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
@@ -10,6 +10,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
     "express": "^4.21.2"
   }
 }
