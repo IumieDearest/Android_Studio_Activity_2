@@ -267,6 +267,37 @@ app.post("/customers", async (req, res) => {
   });
 });
 
+// ---------------------------------------------------------------------
+//  NEW: GET /customers  (CUSTOMER LIST)
+//  Sends back every customer from the "customer" table on Supabase,
+//  sorted by customerid (1, 2, 3...). Used by the Customer List in the app.
+//  This is a GET route, so you can also open it in your browser to test it.
+// ---------------------------------------------------------------------
+app.get("/customers", async (req, res) => {
+  // Stop early if the server isn't connected to Supabase
+  if (!supabase) {
+    return res.status(500).json({ success: false, message: "Server is not connected to the database." });
+  }
+
+  // SELECT all rows. This is the same as the SQL:
+  // SELECT * FROM customer ORDER BY customerid ASC;
+  const { data, error } = await supabase
+    .from("customer")
+    .select("*")
+    .order("customerid", { ascending: true });
+
+  if (error) {
+    console.log("Select error:", error.message);
+    return res.status(500).json({ success: false, message: "Database error: " + error.message });
+  }
+
+  return res.status(200).json({
+    success: true,
+    count: data.length,
+    customers: data
+  });
+});
+
 app.listen(PORT, () => {
   console.log("Server is running on port " + PORT);
 });
