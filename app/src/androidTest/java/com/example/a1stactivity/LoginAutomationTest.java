@@ -13,7 +13,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.isEnabled;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
-import static org.hamcrest.CoreMatchers.startsWith;
 
 import android.os.SystemClock;
 import android.view.View;
@@ -42,7 +41,7 @@ import org.junit.runners.MethodSorters;
 //    Scenario 1: Invalid Login -> wrong password, must stay on the Login screen
 //    Scenario 2: Valid Login   -> correct account, opens the OTP screen, then:
 //                 2a. Invalid OTP -> wrong code, must stay on the OTP screen
-//                 2b. Valid OTP   -> correct code, must open the Users list
+//                 2b. Valid OTP   -> correct code, must open the Main Dashboard
 // =====================================================================
 
 // Tells Android to run this class as an instrumented test (on the emulator)
@@ -143,9 +142,9 @@ public class LoginAutomationTest {
                 allOf(isEnabled(), withText(R.string.btn_verify)),
                 SERVER_TIMEOUT_MS);
 
-        // 8. CHECK: we are still on the OTP screen, and the Users screen did NOT open
+        // 8. CHECK: we are still on the OTP screen, and the Dashboard did NOT open
         onView(withId(R.id.etOtp)).check(matches(isDisplayed()));
-        onView(withId(R.id.tvUserCount)).check(doesNotExist());
+        onView(withId(R.id.btnCustomers)).check(doesNotExist());
 
         // Keep the screen up so the viewer can read "Incorrect code. Please try again."
         pause(RESULT_DELAY_MS);
@@ -166,13 +165,8 @@ public class LoginAutomationTest {
         // 11. Tap Verify
         onView(withId(R.id.btnVerify)).perform(scrollTo(), click());
 
-        // 12. CHECK: wait until the Users screen opens AND the list has loaded.
-        //    The count text says "Loading users…" first, then "Registered users: 2".
-        waitUntil(withId(R.id.tvUserCount),
-                withText(startsWith("Registered users")),
-                SERVER_TIMEOUT_MS);
+        waitUntil(withId(R.id.btnCustomers), isDisplayed(), SERVER_TIMEOUT_MS);
 
-        // Keep the Users list up so the viewer can see the final result
         pause(RESULT_DELAY_MS);
     }
 

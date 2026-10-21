@@ -62,4 +62,28 @@
     <string name="header_name">Name</string>
     <string name="header_email">Email</string>
     <string name="btn_log_out">Log Out</string>
+
+    <!-- Main Dashboard -->
+    <string name="title_dashboard">Main Dashboard</string>
+    <string name="subtitle_dashboard">Welcome! What would you like to manage today?</string>
+    <string name="btn_customers">Customers</string>
+
+    <!-- Customers screen: Add Customer form -->
+    <string name="title_add_customer">Add Customer</string>
+    <string name="label_customer_id">Customer ID</string>
+    <string name="hint_customer_id">e.g. 1</string>
+    <string name="label_mobile_no">Mobile Number</string>
+    <string name="hint_mobile_no">e.g. 09171234567</string>
+    <string name="label_address">Address</string>
+    <string name="hint_address">Enter the address</string>
+    <string name="btn_add_customer">Add Customer</string>
+    <string name="adding_customer">Adding…</string>
+
+    <!-- Customers screen: Customer List table -->
+    <string name="title_customer_list">Customer List</string>
+    <string name="loading_customers">Loading customers…</string>
+    <string name="customer_count">Total customers: %1$d</string>
+    <string name="header_id">ID</string>
+    <string name="header_mobile">Mobile</string>
+    <string name="header_address">Address</string>
 </resources>

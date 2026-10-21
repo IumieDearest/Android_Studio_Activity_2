@@ -104,7 +104,7 @@ public class OtpActivity extends AppCompatActivity {
                     if (finalSuccess) {
                         countDownTimer.cancel();
 
-                        Intent intent = new Intent(OtpActivity.this, UsersActivity.class);
+                        Intent intent = new Intent(OtpActivity.this, DashboardActivity.class);
                         startActivity(intent);
 
                         finish();
